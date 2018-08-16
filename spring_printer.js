@@ -3,6 +3,7 @@ var Name; //ファイル名
 var Radius;
 var Hight;
 var Nozzle;
+var Bed;
 var PSpeed;
 var EMulti;
 
@@ -71,7 +72,8 @@ function makeGcode(){
     for(var t=1; t<=Divide; t++){
       LoopX = Radius*Math.cos(2*Math.PI/Divide*t);
       LoopY = Radius*Math.sin(2*Math.PI/Divide*t);
-      content += ["G1 X" + LoopX + " Y" + LoopY + " Z" + (Hight/Divide*t+Hight*i) + " E" + Extrude + "\n"].join("");
+      content += ["G92 E0\n",
+                  "G1 X" + LoopX + " Y" + LoopY + " Z" + (Hight/Divide*t+Hight*i) + " E" + Extrude + "\n"].join("");
     }
   }
 
@@ -83,9 +85,12 @@ function Gcode_Start(){  //Gcode start
               "M82\n",  //set extruder to absolute mode
               "M106 S255\n" ,      //Fan On
               "M104 S" + Nozzle +"\n",  //Set Extruder Temperature
-              "M109 S" + Nozzle + "\n"].join("");  //Set Extruder Temperature and Wait
+              "M140 S" + Bed + "\n", //Set Bed Temperature
+              "M109 S" + Nozzle + "\n", //Set Extruder Temperature and Wait
+              "M190 S" + Bed + "\n"].join("");  //Set Bed Temperature and Wait
 
-              content += [ "G28\n"]; //Move to Origin
+              content += [ "G28\n", //Move to Origin
+                          "G1 X100 E10 F600\n"]; //Prime nozzle
 
   content += [ "G1 X" + CenterX + " Y" + CenterY + " Z" + FHight + " F1000 ;Move to new Origin\n",
               "G92 X0 Y0 Z0 E0\n", //Set Position
