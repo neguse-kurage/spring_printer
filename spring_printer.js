@@ -6,6 +6,7 @@ var Nozzle;
 var Bed;
 var PSpeed;
 var EMulti;
+var Fan;
 
 var CenterX;
 var CenterY;
@@ -37,8 +38,10 @@ function get(){
   Radius = Number(document.getElementById('Radius').value);
   Hight = Number(document.getElementById('Hight').value);
   Nozzle = Number(document.getElementById('Nozzle').value);
+  Bed = Number(document.getElementById('Bed').value);
   PSpeed = Number(document.getElementById('PSpeed').value);
   Emulti = Number(document.getElementById('Emulti').value);
+  Fan = Number(document.getElementById('Fan').value);
 
   CenterX = Number(document.getElementById('CenterX').value);
   CenterY = Number(document.getElementById('CenterY').value);
@@ -68,12 +71,12 @@ function makeGcode(){
   Gcode_Start();
 
   for(var i=0; i<Times; i++){
-    content += ["G1 X" + Radius + " Y0\n"].join(""); //loop start Gcode
+    content += ["G1 X" + Radius*2 + " Y" + Radius + " Y0\n"].join(""); //loop start Gcode
     for(var t=1; t<=Divide; t++){
       LoopX = Radius*Math.cos(2*Math.PI/Divide*t);
       LoopY = Radius*Math.sin(2*Math.PI/Divide*t);
       content += ["G92 E0\n",
-                  "G1 X" + LoopX + " Y" + LoopY + " Z" + (Hight/Divide*t+Hight*i) + " E" + Extrude + "\n"].join("");
+                  "G1 X" + (LoopX+Radius) + " Y" + (LoopY+Radius) + " Z" + (Hight/Divide*t+Hight*i) + " E" + Extrude + "\n"].join("");
     }
   }
 
@@ -83,7 +86,7 @@ function makeGcode(){
 function Gcode_Start(){  //Gcode start
   content += [ "G90\n",  //Set to Absolute Positioning
               "M82\n",  //set extruder to absolute mode
-              "M106 S255\n" ,      //Fan On
+              "M106 S" + Fan + "\n" ,      //Fan On
               "M104 S" + Nozzle +"\n",  //Set Extruder Temperature
               "M140 S" + Bed + "\n", //Set Bed Temperature
               "M109 S" + Nozzle + "\n", //Set Extruder Temperature and Wait
@@ -116,7 +119,7 @@ function write_parameter(){
               ";CenterX : " + CenterX + "\n",
               ";CenterY : " + CenterY + "\n",
               ";First Hight : " + FHight + "\n",
-              ";Divivde Number : " + Divide + "\n",
+              ";Divide Number : " + Divide + "\n",
               ";Times : " + Times + "\n",
               "\n",].join("");
 }
